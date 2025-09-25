@@ -2,3 +2,5 @@ node_modules
 service-credentials
 .env.local
 .env
+.DS_Store
+dist/

@@ -6,3 +6,4 @@ apps/api/service-credentials.json
 apps/**/.env
 service-credentials.json
 *.pem
+.DS_Store
