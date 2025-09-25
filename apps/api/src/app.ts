@@ -35,7 +35,7 @@ app.use(
 );
 
 // Good practice: handle preflight early
-app.options("*", cors());
+app.options('/*', cors());
 app.use(morgan("dev"));
 app.use(json({ limit: "2mb" }));
 app.use(urlencoded({ extended: true }));
