@@ -13,7 +13,10 @@ import publicRoutes from "./routes/public";
 
 const app = express();
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+    origin: process.env.CORS_ORIGIN?.split(","),
+    credentials: true,
+  }));
 app.use(morgan("dev"));
 app.use(json({ limit: "2mb" }));
 app.use(urlencoded({ extended: true }));
