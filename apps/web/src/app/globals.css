@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes pop-in { from { opacity: 0; transform: translate(-50%, 0.5rem) } to { opacity: 1; transform: translate(-50%, 0) } }
+@keyframes pop-out { from { opacity: 1; transform: translate(-50%, 0) } to { opacity: 0; transform: translate(-50%, 0.5rem) } }
+
+[data-state="open"].animate-fade-in { animation: fade-in 150ms ease-out; }
+[data-state="closed"].animate-fade-out { animation: fade-out 120ms ease-in; }
+[data-state="open"].animate-pop-in { animation: pop-in 150ms ease-out; }
+[data-state="closed"].animate-pop-out { animation: pop-out 120ms ease-in; }
+
+
+
+:root{
+  --bg:#F7F7FB;
+  --card:#FFFFFF;
+  --text:#0F172A;
+  --muted:#6B7280;
+  --line:#E5E7EB;
+  --primary:#6C4CF5;           /* purple from button */
+  --primary-600:#5b3df0;
+  --chip:#E9EDFB;
+}
+
+.body-like{ background:var(--bg); color:var(--text); }
+.card{ background:var(--card); border:1px solid var(--line); border-radius:16px; }
+.h1{ font-size:28px; font-weight:700; }
+.h2{ font-size:18px; font-weight:600; }
+.muted{ color:var(--muted); }
+
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:44px; padding:0 18px; border-radius:999px; font-weight:600; }
+.btn-primary{ background:var(--primary); color:#fff; }
+.btn-primary:hover{ background:var(--primary-600); }
+.btn-ghost{ background:#fff; border:1px solid var(--line); color:var(--text); }
+
+.input{
+  height:44px; width:100%; border:1px solid var(--line); border-radius:999px;
+  padding:0 16px; background:#F9FAFB;
+}
+.select, .textarea{ border:1px solid var(--line); border-radius:10px; background:#fff; padding:10px 12px; }
+.badge{ background:var(--chip); color:#3B5BDB; font-weight:600; padding:6px 10px; border-radius:999px; font-size:12px; }
+.table{ width:100%; border-collapse:separate; border-spacing:0; }
+.table th{ text-align:left; background:#CAD7F3; color:#1F2937; font-weight:700; padding:14px 12px; }
+.table td{ padding:14px 12px; border-bottom:1px solid var(--line); }
+.toolbar{ display:flex; gap:12px; align-items:center; justify-content:space-between; }
+.toolbar-left{ display:flex; gap:12px; align-items:center; }
+.toolbar-right{ display:flex; gap:12px; align-items:center; }

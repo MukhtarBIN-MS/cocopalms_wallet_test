@@ -1,0 +1,4 @@
+node_modules
+service-credentials.json
+apps/api/service-credentials.json
+.env

@@ -1,0 +1,19 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "CommonJS",
+      "rootDir": "./src",
+      "outDir": "./dist",
+      "baseUrl": "./src",
+      "paths": {
+        "@utils/*": ["utils/*"],
+        "@middleware/*": ["middleware/*"],
+        "@controllers/*": ["controllers/*"],
+        "@models/*": ["models/*"]
+      }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+  }
+  

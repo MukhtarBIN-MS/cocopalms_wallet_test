@@ -1,0 +1,20 @@
+{
+  "name": "wallet-admin",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "start": "pnpm -r run start",
+    "seed:admin": "pnpm --filter api run seed:admin"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "dependencies": {
+    "google-auth-library": "^10.3.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
