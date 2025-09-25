@@ -17,9 +17,7 @@ const allowedOrigins = [
     "http://localhost:3000",
     "https://cocopalmswallet.netlify.app", // 👈 add this
   ];
-  .split(",")
-  .map(s => s.trim())
-  .filter(Boolean);
+ 
 
 // 1) Main CORS middleware (no path string)
 app.use(cors({
@@ -46,3 +44,5 @@ app.use("/api/public", publicRoutes);
 
 app.get("/health", (_, res) => res.json({ ok: true }));
 export default app;
+
+
