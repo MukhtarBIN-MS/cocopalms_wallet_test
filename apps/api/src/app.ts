@@ -13,7 +13,10 @@ import publicRoutes from "./routes/public";
 
 const app = express();
 app.use(helmet());
-const allowedOrigins = (process.env.CORS_ORIGIN || "")
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://cocopalmswallet.netlify.app", // 👈 add this
+  ];
   .split(",")
   .map(s => s.trim())
   .filter(Boolean);
