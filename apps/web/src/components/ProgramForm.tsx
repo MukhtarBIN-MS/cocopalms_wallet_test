@@ -2,6 +2,7 @@
 
 import { memo, useState, DragEvent } from "react";
 import { adminPost } from "@/lib/api"; // ✅ use admin client
+import Image from "next/image";
 
 /* ---- Extracted, stable components ---- */
 type FieldProps = {
@@ -137,8 +138,12 @@ function ProgramFormBase({
         themeUrl,
       });
       onCreated();
-    } catch (e: any) {
-      setErr(e?.message || "Failed to create program");
+    }  catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      } else {
+        console.error("Unknown error", e);
+      }
     } finally {
       setSaving(false);
     }
@@ -218,7 +223,7 @@ function ProgramFormBase({
             onDrop={onDrop}
           >
             {form.themeUrl ? (
-              <img
+              <Image
                 src={form.themeUrl}
                 className="w-[80px] h-[80px] object-cover rounded"
                 alt="theme"

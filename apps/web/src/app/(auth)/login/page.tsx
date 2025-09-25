@@ -17,8 +17,12 @@ export default function LoginPage() {
       const { data } = await adminApi.post("/auth/login", { email, password });
       setToken(data.token);
       router.push("/dashboard");
-    } catch (e: any) {
-      setErr(e?.response?.data?.error ?? "Login failed");
+    }  catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      } else {
+        console.error("Unknown error", e);
+      }
     }
   }
 

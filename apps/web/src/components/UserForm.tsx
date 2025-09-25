@@ -75,9 +75,13 @@ function UserFormBase({
         programId,
       });
       onCreated();
-    } catch (e: any) {
-      setErr(e?.message || "Failed to create user");
-    } finally {
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      } else {
+        console.error("Unknown error", e);
+      }
+    }finally {
       setSaving(false);
     }
   }

@@ -3,6 +3,7 @@
 import axios from "axios";
 import { getToken } from "./auth";
 
+
 function base(root = "") {
   return (root || "").replace(/\/+$/, ""); // trim trailing slash
 }

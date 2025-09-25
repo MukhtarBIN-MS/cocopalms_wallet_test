@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getToken, clearToken } from "@/lib/auth";
 import { usePathname, useRouter } from "next/navigation";
@@ -52,7 +53,12 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="p-4 border-r bg-white">
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-8 h-8 rounded-full bg-blue-200" />
+          <Image
+            src="/avatar.png"
+            alt="Avatar"
+            className="w-8 h-8 rounded-full object-cover"
+          />
+
           <div className="font-semibold">UBS</div>
         </div>
         <nav className="space-y-2">

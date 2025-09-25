@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 /** ---------------- Config ---------------- */
 // Use the PUBLIC mount
@@ -78,10 +79,13 @@ export default function ClaimPage() {
         const data = await getJSON<ProgramsResponse>(`${API_BASE}/programs`);
         if (!mounted) return;
         setPrograms((data?.items ?? []).filter(Boolean));
-      } catch (e: any) {
-        if (!mounted) return;
-        setLoadErr(e?.message || "Failed to load programs");
-      } finally {
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        } else {
+          console.error("Unknown error", e);
+        }
+      }finally {
         if (mounted) setLoadingPrograms(false);
       }
     })();
@@ -136,10 +140,12 @@ export default function ClaimPage() {
           ? "User created. You can now add the card to Google Wallet."
           : "User created successfully. Wallet link is not available yet."
       );
-    } catch (e: any) {
-      setErr(e?.message || "Failed to submit");
-    } finally {
-      setSubmitting(false);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      } else {
+        console.error("Unknown error", e);
+      }
     }
   }
 
@@ -248,7 +254,7 @@ export default function ClaimPage() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-900 transition"
                 >
-                  <img
+                  <Image
                     src="/google_wallet_icon.png"
                     alt="Google Wallet"
                     className="w-6 h-6"

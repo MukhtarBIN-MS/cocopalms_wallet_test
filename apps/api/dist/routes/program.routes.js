@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const program_controller_1 = require("../controllers/program.controller");
+const r = (0, express_1.Router)();
+r.use(auth_1.requireAdmin);
+r.get("/", program_controller_1.listPrograms);
+r.post("/", program_controller_1.createProgram);
+r.delete("/:id", program_controller_1.removeProgram);
+exports.default = r;

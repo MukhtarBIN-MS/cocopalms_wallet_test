@@ -71,11 +71,6 @@ export default function ProgramsPage() {
   }, [filtered]);
 
   const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = useCallback(() => setOpen(false), []);
-  const handleCreated = useCallback(() => {
-    setOpen(false);
-    mutate();
-  }, [mutate]);
 
   const onDelete = useCallback(
     async (id: string) => {
@@ -247,7 +242,7 @@ export default function ProgramsPage() {
   );
 }
 
-function escapeCSV(v: any) {
+function escapeCSV(v: string) {
   const s = String(v ?? "");
   return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }

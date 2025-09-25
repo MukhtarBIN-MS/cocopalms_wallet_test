@@ -1,7 +1,6 @@
 "use client";
 
 import useSWR from "swr";
-import Link from "next/link";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { useMemo, useState, useCallback } from "react";
 import { adminGet } from "@/lib/api";
@@ -26,12 +25,6 @@ export default function UsersPage() {
   const [q, setQ] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
   const [open, setOpen] = useState(false);
-
-  const handleClose = useCallback(() => setOpen(false), []);
-  const handleCreated = useCallback(() => {
-    setOpen(false);
-    mutate();
-  }, [mutate]);
 
   const items: UserRow[] = (data?.items ?? []).filter(Boolean);
 
@@ -73,7 +66,7 @@ export default function UsersPage() {
     a.download = "users.csv";
     a.click();
   }
-  const esc = (v: any) => {
+  const esc = (v: string) => {
     const s = String(v ?? "");
     return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
