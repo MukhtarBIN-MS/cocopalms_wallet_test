@@ -18,21 +18,17 @@ const allowedOrigins = (process.env.CORS_ORIGIN || "")
   .map(s => s.trim())
   .filter(Boolean);
 
-// If you use cookies/sessions, keep credentials: true
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      // allow server-to-server/no-origin, and your allowedOrigins list
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked for origin: ${origin}`));
-    },
-    credentials: true, // if you set cookies; ok to leave true
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Authorization"], // optional
-    optionsSuccessStatus: 204,
-  })
-);
+// 1) Main CORS middleware (no path string)
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
+  exposedHeaders: ["Authorization"],
+}));
 
 // Good practice: handle preflight early
 app.options('/*', cors());
