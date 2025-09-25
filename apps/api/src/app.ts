@@ -13,10 +13,29 @@ import publicRoutes from "./routes/public";
 
 const app = express();
 app.use(helmet());
-app.use(cors({
-    origin: process.env.CORS_ORIGIN?.split(","),
-    credentials: true,
-  }));
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
+
+// If you use cookies/sessions, keep credentials: true
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // allow server-to-server/no-origin, and your allowedOrigins list
+      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    credentials: true, // if you set cookies; ok to leave true
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"], // optional
+    optionsSuccessStatus: 204,
+  })
+);
+
+// Good practice: handle preflight early
+app.options("*", cors());
 app.use(morgan("dev"));
 app.use(json({ limit: "2mb" }));
 app.use(urlencoded({ extended: true }));
