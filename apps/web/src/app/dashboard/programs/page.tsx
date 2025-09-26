@@ -14,6 +14,8 @@ type Program = {
   cashbackPct?: number;
   expiryDate?: string | null;
   multiUser?: boolean;
+  description?: string;
+  themeUrl?: string;
 };
 
 type ProgramResponse = { items: Program[] };
@@ -26,6 +28,9 @@ export default function ProgramsPage() {
   const [q, setQ] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
   const [open, setOpen] = useState(false);
+
+  // 👇 ADDED: which program we're editing (null = creating)
+  const [editing, setEditing] = useState<Program | null>(null);
 
   const items: Program[] = (data?.items ?? []).filter(Boolean);
 
@@ -70,7 +75,17 @@ export default function ProgramsPage() {
     a.click();
   }, [filtered]);
 
-  const handleOpen = useCallback(() => setOpen(true), []);
+  // 👇 UPDATED: open create clears editing
+  const handleOpen = useCallback(() => {
+    setEditing(null);
+    setOpen(true);
+  }, []);
+
+  // 👇 ADDED: open edit with selected program
+  const handleOpenEdit = useCallback((p: Program) => {
+    setEditing(p);
+    setOpen(true);
+  }, []);
 
   const onDelete = useCallback(
     async (id: string) => {
@@ -85,9 +100,9 @@ export default function ProgramsPage() {
     <>
       <div className="space-y-4">
         <div className="flex flex-wrap gap-3 items-center justify-between">
-        <div className="h2">Recent Transactions</div>
+          <div className="h2">Recent Transactions</div>
 
-        <div className="">
+          <div>
             <button
               onClick={handleOpen}
               className="px-3 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold flex items-center gap-2"
@@ -99,7 +114,6 @@ export default function ProgramsPage() {
             </button>
           </div>
         </div>
-
 
         {/* Toolbar */}
         <div className="card p-3 flex flex-wrap gap-3 items-center justify-between">
@@ -127,9 +141,7 @@ export default function ProgramsPage() {
           </div>
 
           <div className="flex gap-3 items-center">
-            <button onClick={downloadCSV} className="">
-              ⬇️ Download
-            </button>
+            <button onClick={downloadCSV}>⬇️ Download</button>
           </div>
         </div>
 
@@ -163,25 +175,23 @@ export default function ProgramsPage() {
                     <td>
                       {p.expiryDate
                         ? (() => {
-                            const d = new Date(p.expiryDate);
-                            const date = d
-                              .toLocaleDateString("en-GB", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "2-digit",
-                              })
-                              .replace(/\//g, "-"); // → 12-08-25
-
-                            const time = d
-                              .toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true,
-                              })
-                              .toLowerCase(); // → 11:25 pm
-
-                            return `${date} | ${time.replace(" ", "")}`; // → 12-08-25 | 11:25pm
-                          })()
+                          const d = new Date(p.expiryDate);
+                          const date = d
+                            .toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "2-digit",
+                            })
+                            .replace(/\//g, "-");
+                          const time = d
+                            .toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                            .toLowerCase();
+                          return `${date} | ${time.replace(" ", "")}`;
+                        })()
                         : "-"}
                     </td>
 
@@ -190,20 +200,21 @@ export default function ProgramsPage() {
                         type="checkbox"
                         className="accent-green-600"
                         defaultChecked={!!p.multiUser}
-                        onChange={() => {}}
+                        onChange={() => { }}
                       />
                     </td>
                     <td className="flex gap-2">
                       <button
                         className="btn-ghost h-9 w-9 flex items-center justify-center rounded-lg hover:bg-gray-100"
-                        title="View"
+                        title="Edit"
+                        onClick={() => handleOpenEdit(p)}
                       >
                         <PencilSquareIcon className="h-5 w-5 text-gray-600" />
                       </button>
 
                       <button
                         className="btn-ghost h-9 w-9 flex items-center justify-center rounded-lg hover:bg-gray-100"
-                        title="Edit/Delete"
+                        title="Delete"
                         onClick={() => onDelete(p._id)}
                       >
                         <TrashIcon className="h-5 w-5 text-gray-600" />
@@ -226,16 +237,37 @@ export default function ProgramsPage() {
       {/* Modal */}
       <Modal
         open={open}
-        onClose={() => setOpen(false)}
-        title="New Program"
+        onClose={() => {
+          setOpen(false);
+          setEditing(null);
+        }}
+        title={editing ? "Edit Program" : "New Program"}
         width="max-w-3xl"
       >
         <ProgramForm
-          onCreated={() => {
+          initial={
+            editing
+              ? {
+                id: editing._id,
+                name: editing.name,
+                amount: editing.amount,
+                cashbackPct: editing.cashbackPct ?? 10,
+                expiryDate: editing.expiryDate ?? null,
+                multiUser: !!editing.multiUser,
+                description: editing.description ?? "",
+                themeUrl: editing.themeUrl ?? "",
+              }
+              : undefined
+          }
+          onCreated={async () => {
             setOpen(false);
-            mutate();
+            setEditing(null);
+            await mutate();
           }}
-          onCancel={() => setOpen(false)}
+          onCancel={() => {
+            setOpen(false);
+            setEditing(null);
+          }}
         />
       </Modal>
     </>

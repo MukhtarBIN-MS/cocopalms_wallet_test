@@ -1,7 +1,7 @@
 "use client";
 
-import { memo, useState, DragEvent } from "react";
-import { adminPost } from "@/lib/api"; // ✅ use admin client
+import { memo, useState, useEffect, DragEvent } from "react";
+import { adminPost, adminPut } from "@/lib/api"; // ⬅️ add adminPut
 import Image from "next/image";
 
 /* ---- Extracted, stable components ---- */
@@ -76,12 +76,26 @@ type Form = {
   themeUrl: string;
 };
 
+// ⬇️ Optional props to enable editing (no other changes)
+type ProgramFormInitial = {
+  id: string;
+  name: string;
+  amount: number;
+  cashbackPct?: number;
+  expiryDate?: string | null;
+  multiUser?: boolean;
+  description?: string;
+  themeUrl?: string;
+};
+
 function ProgramFormBase({
   onCreated,
   onCancel,
+  initial, // ⬅️ pass this when opening in edit mode
 }: {
   onCreated: () => void;
   onCancel: () => void;
+  initial?: ProgramFormInitial;
 }) {
   const [form, setForm] = useState<Form>({
     name: "",
@@ -93,9 +107,29 @@ function ProgramFormBase({
     terms: "",
     themeUrl: "",
   });
+  const [editId, setEditId] = useState<string | null>(null); // ⬅️ track editing target
   const [drag, setDrag] = useState(false);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // ⬇️ Prefill when editing
+  useEffect(() => {
+    if (!initial) {
+      setEditId(null);
+      return;
+    }
+    setEditId(initial.id);
+    setForm((prev) => ({
+      ...prev,
+      name: initial.name ?? "",
+      minAmount: String(initial.amount ?? ""),
+      multi: initial.multiUser ? "Yes" : "No",
+      expiryDate: initial.expiryDate ? toDateInput(initial.expiryDate) : "",
+      terms: initial.description ?? "",
+      themeUrl: initial.themeUrl ?? "",
+      // keep lifespan/advance as-is (not part of backend payload currently)
+    }));
+  }, [initial]);
 
   function onDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
@@ -119,6 +153,7 @@ function ProgramFormBase({
     if (form.expiryDate) {
       const d = new Date(form.expiryDate);
       if (!isNaN(d.getTime())) {
+        // store as ISO (UTC)
         expiryDate = d.toISOString();
       }
     }
@@ -128,23 +163,28 @@ function ProgramFormBase({
         ? form.themeUrl
         : undefined;
 
+    const payload = {
+      name: form.name,
+      description: form.terms || undefined,
+      amount,
+      expiryDate,
+      themeUrl,
+      // (multi/lifespan/advance not persisted yet; add server support if needed)
+    };
+
     setSaving(true);
     try {
-      await adminPost("/programs", {
-        name: form.name,
-        description: form.terms || undefined,
-        amount,
-        expiryDate,
-        themeUrl,
-      });
-      onCreated();
-    }  catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
+      if (editId) {
+        // ⬅️ EDIT mode
+        await adminPut(`/programs/${editId}`, payload);
       } else {
-        console.error("Unknown error", e);
+        // ⬅️ CREATE mode
+        await adminPost("/programs", payload);
       }
-    } finally {
+      onCreated();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Unexpected error";
+      setErr(msg);       
       setSaving(false);
     }
   }
@@ -225,6 +265,8 @@ function ProgramFormBase({
             {form.themeUrl ? (
               <Image
                 src={form.themeUrl}
+                width={80}
+                height={80}
                 className="w-[80px] h-[80px] object-cover rounded"
                 alt="theme"
               />
@@ -232,10 +274,30 @@ function ProgramFormBase({
               <div className="text-sm text-gray-500 text-center px-2">
                 Drag image here
                 <br />
-                or <span className="text-blue-600 underline">Browse image</span>
+                or{" "}
+                <span
+                  className="text-blue-600 underline cursor-pointer"
+                  onClick={() => document.getElementById("fileInput")?.click()}
+                >
+                  Browse image
+                </span>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      setForm({ ...form, themeUrl: url });
+                    }
+                  }}
+                />
               </div>
             )}
           </div>
+
           <div className="muted text-sm">Shown on the gift card design.</div>
         </div>
       </div>
@@ -253,3 +315,14 @@ function ProgramFormBase({
 }
 
 export default memo(ProgramFormBase);
+
+// helper: ISO -> yyyy-mm-dd for <input type="date">
+function toDateInput(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const y = d.getFullYear();
+  const m = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  return `${y}-${m}-${day}`;
+}

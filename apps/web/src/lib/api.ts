@@ -3,7 +3,6 @@
 import axios from "axios";
 import { getToken } from "./auth";
 
-
 function base(root = "") {
   return (root || "").replace(/\/+$/, ""); // trim trailing slash
 }
@@ -58,6 +57,17 @@ export async function adminPost<T = unknown>(
 export async function adminDelete<T = unknown>(path: string): Promise<T> {
   try {
     const { data } = await adminApi.delete<T>(path);
+    return data;
+  } catch (err) {
+    throw new Error(toMessage(err));
+  }
+}
+export async function adminPut<T = unknown>(
+  path: string,
+  body: any
+): Promise<T> {
+  try {
+    const { data } = await adminApi.put<T>(path, body);
     return data;
   } catch (err) {
     throw new Error(toMessage(err));

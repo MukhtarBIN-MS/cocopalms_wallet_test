@@ -75,12 +75,10 @@ function UserFormBase({
         programId,
       });
       onCreated();
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
-      } else {
-        console.error("Unknown error", e);
-      }
+    }catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Unexpected error";
+      setErr(msg);       
+      setSaving(false);
     }finally {
       setSaving(false);
     }

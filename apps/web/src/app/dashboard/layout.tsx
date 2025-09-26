@@ -56,6 +56,8 @@ export default function DashboardLayout({
           <Image
             src="/avatar.png"
             alt="Avatar"
+            width={8}
+            height={8}
             className="w-8 h-8 rounded-full object-cover"
           />
 
